@@ -1,0 +1,72 @@
+`timescale 1ns / 1ps
+module slave(
+  input clk,
+  input resetn,
+  input [7:0]s_data,
+  output reg s_ready,
+  input s_valid,
+  input s_last,
+  
+  output reg [7:0]m_data,
+  output reg m_valid,
+  output reg m_last,
+input m_ready);
+ 
+  reg [7:0]mdata;reg mlast;reg mvalid;//reg fi;
+  always@(posedge clk)
+    begin
+      if(resetn==0)
+           s_ready<=0;
+      else if(m_ready && ~s_ready)
+          s_ready<=1;
+      else if(s_valid && s_ready)
+        s_ready<=1;
+      else
+        s_ready<=s_ready;
+    end
+          
+      always@(posedge clk)
+        begin
+          if(resetn==0)
+            mdata<=0;
+          else if(s_valid && s_ready)
+           begin  
+            mdata<=s_data;
+            end
+          else 
+            begin
+            mdata<=0;
+            
+            end
+        end
+       always@(posedge clk)
+        begin
+          if(resetn==0)
+            begin
+           
+              mvalid<=0;
+              mlast<=0;
+            end
+          else if(s_valid && s_ready)
+          begin  
+            mvalid<=1;
+            end
+          
+          else
+            begin
+            mvalid<=0;
+            
+        end
+        end
+          always@(posedge clk)
+            begin  
+              mlast<=s_last;
+            end
+    always@(posedge clk)
+    begin
+      m_data<=mdata;
+      m_last<=mlast;
+      m_valid<=mvalid;
+    end
+endmodule
+  
