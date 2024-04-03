@@ -1,0 +1,52 @@
+`timescale 1ns / 1ps
+
+module tb_1();
+  reg clk, resetn;
+  reg [7:0]s_data;
+  reg s_valid;
+  reg s_last;
+   wire s_ready;
+  wire [7:0]m_data;
+   wire m_valid;
+ wire m_last;
+  reg m_ready;//reg [7:0] temp;
+  integer i;
+  slave s1( clk, resetn,s_data,s_ready,s_valid,s_last,m_data,m_valid,m_last,m_ready);
+  initial begin
+   clk=0;
+   forever #10 clk=~clk;
+  end
+  initial begin
+       
+        resetn=0;
+     #20;resetn=1;
+     m_ready=1;
+     end
+  initial begin
+     s_last=0;s_valid=0;
+     #10;
+       s_data=$urandom%40;
+        s_valid=1;
+     //@(posedge clk)
+     for(i=0;i<18;i=i+1)
+        begin
+       #20;
+         if(s_ready==1)
+            begin
+              //@(posedge clk)
+               s_data=$random%40;
+              
+            end
+          if(s_data<45)
+             s_valid=0;
+          else
+            s_valid=1;
+          if(i==16)
+           s_last=1;
+     end
+     @(posedge clk)
+     s_last=0;s_data=0;s_valid=0;
+     end
+   
+    
+endmodule
