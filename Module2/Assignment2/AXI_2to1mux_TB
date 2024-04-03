@@ -1,0 +1,100 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 28.03.2024 12:09:25
+// Design Name: 
+// Module Name: mux_tb
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module mux_tb();
+reg clk, resetn;
+reg sel;
+reg [7:0]s1_data;
+reg s1_valid,s1_last;
+wire s1_ready;
+reg [7:0]s2_data;
+reg s2_valid,s2_last;
+wire s2_ready;
+wire [7:0]m_data;
+wire m_valid,m_last;
+reg m_ready;
+integer i,j;
+axi_2to1_mux dut(clk,resetn,sel,s1_data,s1_valid,s1_last,s1_ready,
+s2_data,s2_valid,s2_last,s2_ready,m_data,m_valid,m_last,m_ready);
+initial begin
+   clk=0;resetn=0;s1_data=0;s2_data=0;s1_valid=0;s2_valid=0;
+   forever #10 clk=~clk;
+   end
+   initial begin
+    sel=1;
+  end
+  initial
+  begin
+  m_ready=0;s1_last=0;s2_last=0;
+  #30;resetn=1;sel=0;
+  #30;  
+       m_ready=1;
+       #10;
+     if(~sel)
+     begin    
+   @(posedge clk)
+      for(i=0;i<11;i=i+1)
+         begin
+        #20; 
+        if(m_ready==1 & s1_ready==1 )
+             begin
+              s1_data=$random%40;
+             end
+           
+           if(s1_data<50)
+                s1_valid=1;
+           else
+                s1_valid=0;
+           if(i==9)
+            s1_last=1; 
+      end
+     
+      @(posedge clk)
+           s1_last=0;s1_data=0;s1_valid=0;   
+      end
+      #20;sel=1;
+     if(sel)
+      begin  
+           s2_last=0;s2_data=0;s2_valid=0;
+         @(posedge clk)
+            for(j=0;j<9;j=j+1)
+               begin
+              #20;
+              if(s2_ready==1 & s1_valid==0)
+                   begin
+                    s2_data=$random%40;
+                     
+                   end
+                 if(s2_data<35)
+                  s2_valid=1;
+                 else
+                   s2_valid=0;
+                   if(j==7)
+                    s2_last=1;
+                 
+            end
+           
+            @(posedge clk)
+                       s2_last=0;s2_data=0;s2_valid=0;       
+            end
+            end
+      endmodule
