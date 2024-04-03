@@ -27,7 +27,7 @@ input [7:0]s2_data,input s2_valid,input s2_last,output reg s2_ready,
 output reg [7:0]m_data,output reg m_valid,output reg m_last,input m_ready
     );
     reg [7:0]data;reg last;reg valid;
-    always@(posedge clk or sel)
+    always@(posedge clk)
         begin
           if(resetn==0)
             begin
