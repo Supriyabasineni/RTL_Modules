@@ -1,0 +1,119 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 28.03.2024 11:08:44
+// Design Name: 
+// Module Name: axi_2to1_mux
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module axi_2to1_mux(
+input clk,input resetn,
+input sel,input [7:0]s1_data,input s1_valid,input s1_last,output reg s1_ready,
+input [7:0]s2_data,input s2_valid,input s2_last,output reg s2_ready,
+output reg [7:0]m_data,output reg m_valid,output reg m_last,input m_ready
+    );
+    reg [7:0]data;reg last;reg valid;
+    always@(posedge clk or sel)
+        begin
+          if(resetn==0)
+            begin
+               s1_ready<=0;
+               s2_ready<=0;
+            end     
+          else 
+            begin
+            
+              if(~sel)
+                    begin
+                       if(m_ready && ~s1_ready )
+                          s1_ready=1;
+                       else if(s1_valid && s1_ready)
+                         s1_ready=0;
+                       else
+                        s1_ready=s1_ready;
+                    end
+               else
+                     begin
+                        if(m_ready && ~s2_ready)
+                          s2_ready=1;
+                         else if(s2_valid && s2_ready)
+                            s2_ready=0;
+                         else
+                            s2_ready=s2_ready;
+                     end
+                    
+            end
+            end
+      always@(posedge clk)
+        begin
+            if(resetn==0)
+                data<=0;
+            else 
+            begin
+            if(~sel)
+            begin
+               if(s1_valid && s1_ready)
+                       begin                       
+                        data<=s1_data;
+                        end
+                      else 
+                        begin
+                        data<=0; 
+                        end
+                    end
+                    else
+                    begin
+                    if(s2_valid && s2_ready)
+                        begin
+                        data<=s2_data;
+                         end
+                   else 
+                         begin
+                          data<=0; 
+                          end
+                      end
+               end
+              end
+           always@(posedge clk)
+             begin
+                 if(resetn==0)
+                   begin
+                      valid<=0;
+                      last<=0;
+                   end
+               else if((s1_valid && s1_ready )||(s2_valid && s2_ready))
+                valid<=1;
+               else
+                   begin
+                      valid<=0;
+                   end
+          end
+          always@(posedge clk)
+            begin
+            if(~sel) begin
+              last<=s1_last;
+              end
+               else
+                   last<=s2_last;
+           end
+           always@(posedge clk)
+               begin
+                 m_data<=data;
+                 m_last<=last;
+                 m_valid<=valid;
+               end
+endmodule
