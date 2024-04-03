@@ -1,4 +1,24 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 26.03.2024 10:49:34
+// Design Name: 
+// Module Name: tb_1
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 
 module tb_1();
   reg clk, resetn;
@@ -28,20 +48,20 @@ module tb_1();
        s_data=$urandom%40;
         s_valid=1;
      //@(posedge clk)
-     for(i=0;i<18;i=i+1)
+     for(i=0;i<15;i=i+1)
         begin
        #20;
-         if(s_ready==1)
+         if(m_ready==1 & s_ready==1)
             begin
               //@(posedge clk)
-               s_data=$random%40;
+               s_data=$urandom%40;
               
             end
-          if(s_data<45)
+          if(s_data<30)
              s_valid=0;
           else
             s_valid=1;
-          if(i==16)
+          if(i==13)
            s_last=1;
      end
      @(posedge clk)
