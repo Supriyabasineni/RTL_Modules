@@ -26,7 +26,7 @@ input sel,input [7:0]s1_data,input s1_valid,input s1_last,output reg s1_ready,
 input [7:0]s2_data,input s2_valid,input s2_last,output reg s2_ready,
 output reg [7:0]m_data,output reg m_valid,output reg m_last,input m_ready
     );
-    reg [7:0]data;reg last;reg valid;
+    reg [7:0]mdata;reg mlast;reg mvalid;
     always@(posedge clk)
         begin
           if(resetn==0)
@@ -61,29 +61,29 @@ output reg [7:0]m_data,output reg m_valid,output reg m_last,input m_ready
       always@(posedge clk)
         begin
             if(resetn==0)
-                data<=0;
+                mdata<=0;
             else 
             begin
             if(~sel)
             begin
                if(s1_valid && s1_ready)
                        begin                       
-                        data<=s1_data;
+                        mdata<=s1_data;
                         end
                       else 
                         begin
-                        data<=0; 
+                        mdata<=0; 
                         end
                     end
                     else
                     begin
                     if(s2_valid && s2_ready)
                         begin
-                        data<=s2_data;
+                        mdata<=s2_data;
                          end
                    else 
                          begin
-                          data<=0; 
+                          mdata<=0; 
                           end
                       end
                end
@@ -92,28 +92,32 @@ output reg [7:0]m_data,output reg m_valid,output reg m_last,input m_ready
              begin
                  if(resetn==0)
                    begin
-                      valid<=0;
-                      last<=0;
+                      mvalid<=0;
                    end
                else if((s1_valid && s1_ready )||(s2_valid && s2_ready))
-                valid<=1;
+                mvalid<=1;
                else
                    begin
-                      valid<=0;
+                      mvalid<=0;
                    end
           end
           always@(posedge clk)
             begin
+            if(resetn==0)
+               mlast<=0;
+               else
+               begin
             if(~sel) begin
-              last<=s1_last;
+              mlast<=s1_last;
               end
                else
-                   last<=s2_last;
+                   mlast<=s2_last;
+           end
            end
            always@(posedge clk)
                begin
-                 m_data<=data;
-                 m_last<=last;
-                 m_valid<=valid;
+                 m_data<=mdata;
+                 m_last<=mlast;
+                 m_valid<=mvalid;
                end
 endmodule
