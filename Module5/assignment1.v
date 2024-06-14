@@ -33,7 +33,7 @@ output reg m_valid,
 output reg m_last,
 input  m_ready,
 output reg [7:0]m_keep,
-input rd_en,input [11:0]k
+input rd_en//,input [11:0]k
     );
     //localparam c;
     reg [11:0]n=0;reg [6:0]temp,temp1,temp2,tem;
@@ -46,14 +46,17 @@ input rd_en,input [11:0]k
     begin
     s_ready=m_ready;
     end
+    
     always@(posedge clk)
     begin
     if(~arst) begin
     wr_ptr<=0;rd_ptr<=0;count<=0;
-    state<=idle;end
+    state<=idle;
+    end
     else
     state<=next_state;
     end
+    
     always@(posedge clk)
     begin
     case(state)
@@ -137,6 +140,7 @@ input rd_en,input [11:0]k
        end          
     endcase
     end
+    
     always@(posedge clk)
     begin
     case(next_state)
@@ -203,6 +207,7 @@ input rd_en,input [11:0]k
     endcase
     
     end
+    
      always@(posedge clk)
         begin
              if(s_last==1)
