@@ -23,7 +23,7 @@
 module fp_add1#(
 parameter i1=4,f1=5,
 parameter i2=4,f2=5,
-parameter out_i=5,out_f=3
+parameter out_i=4,out_f=4
 )
 (input clk,
 input [i1+f1-1:0]a,
@@ -167,11 +167,14 @@ begin
 if(out_i>high_i)
 overflow=0;
 else if(out_i==high_i)
-overflow=(temp_a[high_i+high_f-1]^temp_sum[high_i+high_f-1]) && (temp_b[high_i+high_f-1]^temp_sum[high_i+high_f-1]); 
-else if(temp_sum[high_i+high_f]==0)
+overflow=((temp_a[high_i+high_f-1]^temp_sum[high_i+high_f-1]) && (temp_b[high_i+high_f-1]^temp_sum[high_i+high_f-1])); 
+else if(out_i<high_i)
+begin
+ if(temp_sum[high_i+high_f]==0)
 overflow=|temp_sum[high_i+high_f:(high_i+high_f-(high_i-(out_i)))];
 else if(temp_sum[high_i+high_f]==1)
 overflow=(~(&temp_sum[high_i+high_f:high_f+out_i]));
+end
 else
 overflow=0;//==temp_sum[high_i+high_f]);//overflow=0;
 end
@@ -245,7 +248,7 @@ if(sign_add==1)
 begin
 if(underflow)
 //sum={{temp_sum[high_i+high_f:high_f]},{{high_f-out_i}{1'b0}},{1'b1}};
-temp_sumf={{{high_f-(high_f-out_f)-1}{1'b0}},{1'b1}};
+temp_sumf={{{high_f-(high_f-out_f)-1}{1'b0}},{1'b1}};//temp_sum[high_f-1:high_f-(high_f-out_f)]
 else
 //sum=temp_sum;
 temp_sumf=temp_sum[high_f-1:0];
@@ -260,32 +263,7 @@ else
 temp_sumf=temp_sum[high_f-1:high_f-out_f];
 end
 end
-//always@(posedge clk)
-//begin
-//if(sign_add==0)
-//begin
-//if(overflow)
-//sum={{out_i{1'b1}},{temp_sum[high_f-1:0]}};
-//else if(underflow)
-//sum={{temp_sum[high_i+high_f:high_f]},{{high_f-out_i}{1'b0}},{1'b1}};
-//else
-//sum={{temp_sum[high_i+high_f:high_f]},{temp_sum[high_f-1:(high_f-(high_f-out_f))]}};
-//end
-//else
-//begin
-//if(overflow & temp_sum[high_i+high_f]==0)
-//sum= {{temp_sum[high_i+high_f]},{(out_i-1){1'b1}},{temp_sum[high_f-1:0]}};
-//else if(overflow & temp_sum[high_i+high_f]==1)
-//sum={{temp_sum[high_i+high_f]},{(out_i-1){1'b0}},{temp_sum[high_f-1:0]}};
-//else if(underflow & temp_sum[high_i+high_f]==0)
-//sum={{temp_sum[high_i+high_f:high_f]},{{high_f-out_i}{1'b0}},{1'b1}};
-//else if(underflow & temp_sum[high_i+high_f]==1)
-//sum={{temp_sum[high_i+high_f:high_f]},{{high_f-out_i}{1'b1}},{1'b0}};
-//else
-//sum=temp_sum;
 
-//end
-//end
 assign sum={{temp_sumi},{temp_sumf}};
 
 endmodule
