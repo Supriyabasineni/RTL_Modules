@@ -23,7 +23,7 @@
 module fp_add1#(
 parameter i1=4,f1=5,
 parameter i2=4,f2=5,
-parameter out_i=4,out_f=4
+parameter out_i=5,out_f=5
 )
 (input clk,
 input [i1+f1-1:0]a,
@@ -105,10 +105,8 @@ output   [out_i+out_f-1:0]sum);
    temp_sum=$signed(temp_a)+$signed(temp_b);
    
  end
- end
- //assign sum=temp_sum;
-
- always@(posedge clk)
+ 
+ else
  begin
  if(!sign_add)
  begin
@@ -156,6 +154,7 @@ output   [out_i+out_f-1:0]sum);
     temp_sum=temp_a+temp_b;
  
  //overflow=temp_sum[high_i+high_f-1];
+ end
  end
  end
  //assign sum=temp_sum;
@@ -251,7 +250,7 @@ if(underflow)
 temp_sumf={{{high_f-(high_f-out_f)-1}{1'b0}},{1'b1}};//temp_sum[high_f-1:high_f-(high_f-out_f)]
 else
 //sum=temp_sum;
-temp_sumf=temp_sum[high_f-1:0];
+temp_sumf=temp_sum[high_f-1:(high_f-out_f)];
 end
 else
 begin
