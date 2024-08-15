@@ -21,7 +21,7 @@
 
 
 module slave(
-input clk,
+  input clk,
   input resetn,
   input [7:0]s_data,
   output  s_ready,
@@ -32,52 +32,61 @@ input clk,
   output reg m_valid,
   output reg m_last,
   input m_ready);
-  reg [7:0]mdata;reg mlast;reg mvalid,mready;
+  
+  
+  
+  reg [7:0]mdata;reg mlast;reg mvalid;
+  
   always@(posedge clk)
   begin
-  if(~resetn)
-  begin
-    mdata=0;
-    mlast=0;
-    mvalid=0;
-    mready=0;
-  end
-  else if(s_valid && s_ready)
-  begin
-    mdata=s_data;
-     mlast=s_last;
-     mvalid=s_valid;
-     mready=m_ready;
-  end
-//  else
-//  begin
-//      //mdata=0;
-//      //mlast=0;
-//      mvalid=0;
-//      //mready=0;
-//    end
-  end
-  always@(posedge clk)
-  begin
-  if(~resetn)
-    begin
-      m_data=0;
-      m_last=0;
-      m_valid=0;
-      
-    end
-    else if(m_ready)
-    begin
-         m_data<=mdata;
-         m_last<=mlast;
-         m_valid<=mvalid;
-         
-    end
+    if(~resetn)
+      begin
+        mdata<=0;
+        mlast<=0;
+        mvalid<=0;
+      end
+    else if(s_valid && s_ready)
+      begin
+        mdata<=s_data;
+        mlast<=s_last;
+        mvalid<=s_valid;
+      end
+    else if(~s_valid && s_ready)
+      begin
+		mdata<=0;
+		mlast<=0;
+		mvalid<=0;
+		//mready=0;
+      end
     else
-    begin
-    m_valid=0;
-    m_last=0;
-    end
+      begin
+        mdata<=mdata;
+        mlast<=mlast;
+        mvalid<=mvalid;
+      end
   end
+  
+  
+  always@(*)
+    begin
+      if(~resetn)
+        begin
+          m_data=0;
+          m_last=0;
+          m_valid=0;    
+        end
+      else if(m_ready)
+        begin
+          m_data=mdata;
+          m_last=mlast;
+          m_valid=mvalid;
+        end
+      else
+        begin
+          m_data=0;
+          m_valid=0;
+          m_last=0;
+        end
+    end
   assign s_ready=m_ready;
 endmodule
