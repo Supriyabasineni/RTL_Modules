@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module assig_2(
+/*module assig_2(
 input clk,
   input resetn,
   input [7:0]s_data,
@@ -52,7 +52,7 @@ input clk,
               else
                 wr_en<=0;
             end       
-        end*/
+        end
       always@(posedge clk)
             begin
               if(~resetn)
@@ -133,5 +133,116 @@ input clk,
             rd_ptr=wr_ptr;
           end
           assign s_ready=m_ready;
+                                 
+endmodule*/
+
+
+module assig_2(
+  input clk,
+  input resetn,
+  input [7:0]s_data,
+  input s_valid,
+  input s_last,
+  output  s_ready,
+  
+  output reg [7:0]m_data,
+  output reg m_valid,
+  output reg m_last,
+  input m_ready,
+  input [4:0]k,len);
+  
+   reg [8:0]fifo[16:0];
+   reg [3:0]rd_ptr,wr_ptr,ptr;reg [4:0]n,m,count,count1;
+   reg rd_en;
+  
+  always@(posedge clk)
+    begin
+      if(~resetn)
+        begin
+          rd_en<=0;count=0;
+        end
+      else
+        begin
+          if(s_last)
+            begin
+              m<=k;
+              rd_en<=1;
+              count<=1;
+              m_last<=0;
+            end
+          else
+            begin
+              if(count<=m-1 && count!=0)
+              begin
+                rd_en<=1;
+                count<=count+1;
+              end
+              else
+                rd_en<=0;
+            end  
+          if(ptr==rd_ptr && rd_en)
+            m_last<=1;
+          else
+            m_last<=0;  
+        end    
+    end 
+  
+  
+  always@(posedge clk)
+    begin
+      if(~resetn)
+        begin
+          wr_ptr<=0; 
+        end
+      else
+        begin
+          if(n>len-(k)  && s_valid && s_ready) 
+            begin
+              fifo[wr_ptr]<=s_data;
+              wr_ptr<=wr_ptr+1;
+            
+              if(n==(len-k)+1)
+              ptr<=wr_ptr;
+            end
+            else
+            begin
+              wr_ptr<=wr_ptr;
+            end
+        end
+    end 
+  
+   
+   always@(posedge clk)
+     begin
+       if(~resetn)
+         begin
+           m_data<=0;
+           rd_ptr<=0;n<=0;
+         end
+       else
+         begin
+           if(rd_en && s_valid && s_ready ) 
+             begin
+               m_data<=fifo[rd_ptr]+s_data;
+               rd_ptr<=rd_ptr-1;
+               m_valid<=1;
+             end
+           else 
+             begin
+               m_data<=s_data;
+               m_valid<=0; 
+             end
+           if(n<len )
+             n<=n+1;
+           else
+             n<='d1;
+           if(s_last)
+        begin
+          rd_ptr<=wr_ptr;
+        end
+         end
+     end 
+
+  assign s_ready=m_ready;
                                  
 endmodule
