@@ -47,7 +47,7 @@ input m_ready
     assign full=full1;
     //assign m_last=(k==5);
     //assign m_last=t1_last;
-    initial begin
+    /*initial begin
     m_last=0;
     end
     always@(posedge clk)
@@ -68,7 +68,7 @@ input m_ready
     
     end 
     end
-    end
+    end*/
     
 endmodule
 
